@@ -1,5 +1,7 @@
 # mbsecli
 
+> **Website & Live Demo:** [https://techmuch.github.io/mbseCLI/](https://techmuch.github.io/mbseCLI/)
+
 A CLI + local web server for live visualization and review of SysML v2
 textual models. Point it at a `.sysml` file (or a directory of them) and it
 watches the file, parses it, and serves an interactive UI — object tree,
