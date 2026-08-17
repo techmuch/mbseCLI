@@ -1,0 +1,17 @@
+# Go
+/mbsecli
+*.test
+*-go-tmp-umask
+
+# Frontend
+web/node_modules/
+web/dist/*
+!web/dist/index.html
+web/tsconfig.tsbuildinfo
+web/vite.config.ts.timestamp-*.mjs
+
+# Feedback sidecars are per-reviewer local state, not source
+.*.feedback.json
+
+# OS
+.DS_Store
