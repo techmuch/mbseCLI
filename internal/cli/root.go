@@ -8,7 +8,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const Version = "0.1.3"
+const Version = "0.1.4"
 
 func Execute() {
 	root := &cobra.Command{
