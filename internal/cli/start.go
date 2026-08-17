@@ -6,7 +6,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/exec"
 	"path/filepath"
+	"runtime"
 	"time"
 
 	"mbsecli/internal/feedback"
@@ -18,18 +20,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newServeCmd() *cobra.Command {
+func newStartCmd() *cobra.Command {
 	var (
 		dir      string
 		port     int
 		debounce time.Duration
 		dev      bool
+		open     bool
 	)
 
 	cmd := &cobra.Command{
-		Use:   "serve [file-or-directory]",
-		Short: "Watch a .sysml file (or directory of them) and serve the visualizer",
-		Args:  cobra.MaximumNArgs(1),
+		Use:     "start [file-or-directory]",
+		Aliases: []string{"serve"},
+		Short:   "Watch a .sysml file (or directory of them) and start the visualizer",
+		Args:    cobra.MaximumNArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			target := dir
 			if len(args) == 1 {
@@ -38,7 +42,7 @@ func newServeCmd() *cobra.Command {
 			if target == "" {
 				target = "."
 			}
-			return runServe(target, port, debounce, dev)
+			return runStart(target, port, debounce, dev, open)
 		},
 	}
 
@@ -46,11 +50,12 @@ func newServeCmd() *cobra.Command {
 	cmd.Flags().IntVar(&port, "port", 4173, "port to serve the web UI and API on")
 	cmd.Flags().DurationVar(&debounce, "debounce", 200*time.Millisecond, "file-change debounce window")
 	cmd.Flags().BoolVar(&dev, "dev", false, "dev mode: don't serve embedded assets (use with `npm run dev` in web/)")
+	cmd.Flags().BoolVarP(&open, "open", "o", false, "open the browser automatically once started")
 
 	return cmd
 }
 
-func runServe(target string, port int, debounce time.Duration, dev bool) error {
+func runStart(target string, port int, debounce time.Duration, dev bool, open bool) error {
 	info, err := os.Stat(target)
 	if err != nil {
 		return fmt.Errorf("cannot access %s: %w", target, err)
@@ -118,8 +123,32 @@ func runServe(target string, port int, debounce time.Duration, dev bool) error {
 	}()
 
 	addr := fmt.Sprintf(":%d", port)
-	log.Printf("mbsecli serving on http://localhost%s (watching %s)", addr, watchDir)
+	url := fmt.Sprintf("http://localhost%s", addr)
+	log.Printf("mbsecli starting on %s (watching %s)", url, watchDir)
+
+	if open {
+		go func() {
+			time.Sleep(100 * time.Millisecond)
+			if err := openBrowser(url); err != nil {
+				log.Printf("failed to open browser: %v", err)
+			}
+		}()
+	}
+
 	return http.ListenAndServe(addr, srv.Routes())
+}
+
+func openBrowser(url string) error {
+	var cmd *exec.Cmd
+	switch runtime.GOOS {
+	case "darwin":
+		cmd = exec.Command("open", url)
+	case "windows":
+		cmd = exec.Command("cmd", "/c", "start", url)
+	default: // linux, freebsd, openbsd, etc.
+		cmd = exec.Command("xdg-open", url)
+	}
+	return cmd.Start()
 }
 
 func firstSysMLFile(dir string) string {

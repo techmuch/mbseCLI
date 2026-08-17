@@ -22,11 +22,10 @@ seam to swap in a generated ANTLR4 parser later.
 
 ```sh
 make build
-./mbsecli serve examples/drone.sysml
+./mbsecli start --open examples/drone.sysml
 ```
 
-Then open http://localhost:4173. Edit `examples/drone.sysml` in another
-editor and watch the tree and diagram update.
+Then edit `examples/drone.sysml` in your editor and watch the tree and diagram update.
 
 ## Development
 
@@ -62,9 +61,10 @@ model in version control. Notes whose FQN no longer exists after a reparse
 ## CLI
 
 ```sh
-mbsecli serve [file-or-directory]   # default: current directory
+mbsecli start [file-or-directory]   # default: current directory
   --port 4173        # web UI / API port
   --debounce 200ms    # file-change debounce window
+  --open, -o          # open browser automatically once started
   --dev               # skip embedded assets; pair with `npm run dev`
 mbsecli version
 ```

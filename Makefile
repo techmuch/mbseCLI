@@ -30,11 +30,11 @@ endif
 # Run the Go server against Vite's dev server (hot-reloading UI). Run
 # `cd web && npm run dev` in a second terminal alongside this.
 dev:
-	go run ./cmd/mbsecli serve --dev examples/drone.sysml
+	go run ./cmd/mbsecli start --dev examples/drone.sysml
 
 # Run the production binary against the bundled example model.
 run: build
-	./mbsecli serve examples/drone.sysml
+	./mbsecli start --open examples/drone.sysml
 
 tidy:
 	go mod tidy

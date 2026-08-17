@@ -19,7 +19,7 @@ func Execute() {
 			"live-updates as the model changes on disk.",
 	}
 
-	root.AddCommand(newServeCmd())
+	root.AddCommand(newStartCmd())
 	root.AddCommand(newVersionCmd())
 
 	if err := root.Execute(); err != nil {
