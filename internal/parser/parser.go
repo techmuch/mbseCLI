@@ -93,6 +93,18 @@ func Parse(sourceFile string, src []byte) *model.Graph {
 			continue
 		}
 
+		// A `doc /* ... */` statement on its own line — the idiomatic form,
+		// since it's normally the first statement in a definition's body.
+		// Attached to the immediately enclosing block; a real grammar-based
+		// parser would instead attribute it per SysML v2's actual doc-usage
+		// rules (which allow docs on nested elements too).
+		if depth > 0 && strings.HasPrefix(trimmed, "doc") {
+			if m := docRe.FindStringSubmatch(trimmed); m != nil {
+				stack[len(stack)-1].Doc = strings.TrimSpace(m[1])
+			}
+			continue
+		}
+
 		// Unrecognized line inside a block: not fatal, just note it so the
 		// UI can surface "partial parse" state without losing the rest of
 		// the tree.

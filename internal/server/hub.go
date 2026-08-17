@@ -22,10 +22,16 @@ func (h *hub) add() chan []byte {
 	return ch
 }
 
+// remove is idempotent: handleWS's read goroutine and its own deferred
+// cleanup can both race to remove the same client on disconnect, and a
+// double-close would panic.
 func (h *hub) remove(ch chan []byte) {
 	h.mu.Lock()
+	defer h.mu.Unlock()
+	if _, ok := h.clients[ch]; !ok {
+		return
+	}
 	delete(h.clients, ch)
-	h.mu.Unlock()
 	close(ch)
 }
 

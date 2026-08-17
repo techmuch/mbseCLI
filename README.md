@@ -60,6 +60,22 @@ persisted to a JSON sidecar file next to the model
 model in version control. Notes whose FQN no longer exists after a reparse
 (element renamed/deleted) are flagged as orphaned rather than dropped.
 
+## Testing
+
+```sh
+make test    # Go unit tests: internal/parser, internal/feedback
+make e2e     # Playwright, against a real running mbsecli instance
+```
+
+The e2e suite (`web/e2e/`) boots `mbsecli` against a scratch copy of
+`examples/drone.sysml` (see `web/e2e/start-server.sh`) so it's free to edit
+the file on disk — that's what the live-reload test exercises. First-time
+setup needs the browser binary once:
+
+```sh
+cd web && npx playwright install chromium
+```
+
 ## CLI
 
 ```sh

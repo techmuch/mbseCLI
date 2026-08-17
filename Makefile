@@ -1,4 +1,4 @@
-.PHONY: build build-web build-go dev run tidy install uninstall
+.PHONY: build build-web build-go dev run tidy install uninstall test e2e
 
 # Full production build: frontend first (embedded via web/embed.go), then
 # the Go binary that embeds it.
@@ -38,3 +38,13 @@ run: build
 
 tidy:
 	go mod tidy
+
+test:
+	go test ./...
+
+# Browser e2e suite: boots mbsecli against a scratch copy of the example
+# model (see web/e2e/start-server.sh) and drives it with Playwright.
+# Requires the binary to already be built and browsers installed once via
+# `cd web && npx playwright install chromium`.
+e2e: build
+	cd web && npm run e2e
